@@ -1,25 +1,37 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  FlatList,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  ListRenderItem,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  ImageSourcePropType,
+  ListRenderItem,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Movie } from '../types/movie';
+
+const LOGO = require('../assets/images/logo-k.png');
 
 interface HeroBillboardProps {
   movies: Movie[];
 }
 
 const { width: W } = Dimensions.get('window');
+
+function posterSource(movie: Movie): ImageSourcePropType {
+  return typeof movie.poster === 'number'
+    ? movie.poster
+    : { uri: movie.poster };
+}
+
+function isBakedPoster(movie: Movie): boolean {
+  return typeof movie.poster === 'number';
+}
 
 function formatRating(value: number | undefined): string {
   if (value === undefined || Number.isNaN(value)) return '—';
@@ -37,7 +49,7 @@ function formatAgeLabel(age: string | undefined): string {
 function StatusBarMock() {
   return (
     <View style={styles.statusBar}>
-      <Text style={styles.statusTime}>9:41</Text>
+      <Text style={styles.statusTime} allowFontScaling={false}>9:41</Text>
       <View style={styles.statusIcons}>
         <MaterialCommunityIcons
           name="signal-cellular-3"
@@ -57,6 +69,7 @@ function StatusBarMock() {
 
 function PosterOverlay({ movie }: { movie: Movie }) {
   const cinemaLine = movie.heroCinemaLine ?? 'В КИНО С 14 МАЯ';
+  const ageLabel = formatAgeLabel(movie.ageLimit);
   const hasArt =
     movie.heroPosterTitleRed ||
     movie.heroPosterSubtitleWhite ||
@@ -66,25 +79,30 @@ function PosterOverlay({ movie }: { movie: Movie }) {
     <>
       <View style={styles.posterDim} pointerEvents="none" />
       <View style={styles.bannerStrip}>
-        <Text style={styles.bannerText}>{cinemaLine}</Text>
+        <Text style={styles.bannerText} allowFontScaling={false}>{cinemaLine}</Text>
       </View>
       {hasArt ? (
         <View style={styles.posterArtBlock} pointerEvents="none">
           {movie.heroPosterTitleRed ? (
-            <Text style={styles.posterArtRed} numberOfLines={2}>
+            <Text style={styles.posterArtRed} numberOfLines={2} allowFontScaling={false}>
               {movie.heroPosterTitleRed}
             </Text>
           ) : null}
           {movie.heroPosterSubtitleWhite ? (
-            <Text style={styles.posterArtWhiteLine} numberOfLines={1}>
+            <Text style={styles.posterArtWhiteLine} numberOfLines={1} allowFontScaling={false}>
               {movie.heroPosterSubtitleWhite}
             </Text>
           ) : null}
           {movie.heroPosterMotion ? (
-            <Text style={styles.posterArtMotion} numberOfLines={2}>
+            <Text style={styles.posterArtMotion} numberOfLines={2} allowFontScaling={false}>
               {movie.heroPosterMotion}
             </Text>
           ) : null}
+        </View>
+      ) : null}
+      {ageLabel ? (
+        <View style={styles.posterAgeBadge}>
+          <Text style={styles.posterAgeText} allowFontScaling={false}>{ageLabel}</Text>
         </View>
       ) : null}
     </>
@@ -94,67 +112,67 @@ function PosterOverlay({ movie }: { movie: Movie }) {
 function HeroSlide({ movie }: { movie: Movie }) {
   const ageLabel = formatAgeLabel(movie.ageLimit);
   const genre0 = movie.genre?.[0]?.trim();
+  const baked = isBakedPoster(movie);
 
   return (
     <View style={styles.card}>
       <View style={styles.posterWrapper}>
         <Image
-          source={{ uri: movie.poster }}
+          source={posterSource(movie)}
           style={styles.posterImg}
           resizeMode="cover"
         />
-        <PosterOverlay movie={movie} />
+        {!baked ? <PosterOverlay movie={movie} /> : null}
       </View>
 
       <View style={styles.infoCol}>
-        <View style={styles.infoTop}>
-          <Text style={styles.title} numberOfLines={2}>
-            {movie.title}
+        <Text style={styles.title} numberOfLines={2} allowFontScaling={false}>
+          {movie.title.replace(/\\n/g, '\n')}
+        </Text>
+
+        {movie.description ? (
+          <Text style={styles.desc} numberOfLines={1} ellipsizeMode="tail" allowFontScaling={false}>
+            {movie.description}
           </Text>
-          {movie.description ? (
-            <Text style={styles.desc} numberOfLines={2} ellipsizeMode="tail">
-              {movie.description}
-            </Text>
+        ) : null}
+
+        <View style={styles.ratingRow}>
+          {movie.ratingKinopoisk != null ? (
+            <View style={styles.ratingItem}>
+              <View style={styles.kpIconWrap}>
+                <MaterialCommunityIcons
+                  name="white-balance-sunny"
+                  size={12}
+                  color="#FF8A00"
+                />
+              </View>
+              <Text style={styles.ratingNum} allowFontScaling={false}>
+                {formatRating(movie.ratingKinopoisk)}
+              </Text>
+            </View>
+          ) : null}
+
+          {movie.ratingImdb != null ? (
+            <View
+              style={[
+                styles.ratingItem,
+                movie.ratingKinopoisk != null && styles.ratingItemGap,
+              ]}
+            >
+              <View style={styles.imdbBadge}>
+                <Text style={styles.imdbText} allowFontScaling={false}>IMDb</Text>
+              </View>
+              <Text style={styles.ratingNum} allowFontScaling={false}>
+                {formatRating(movie.ratingImdb)}
+              </Text>
+            </View>
           ) : null}
         </View>
 
-        <View style={styles.infoBottom}>
-          <View style={styles.ratingRow}>
-            {movie.ratingKinopoisk != null ? (
-              <View style={styles.ratingItem}>
-                <MaterialCommunityIcons
-                  name="white-balance-sunny"
-                  size={24}
-                  color="#FF8A00"
-                />
-                <Text style={styles.ratingNum}>
-                  {formatRating(movie.ratingKinopoisk)}
-                </Text>
-              </View>
-            ) : null}
-
-            {movie.ratingImdb != null ? (
-              <View
-                style={[
-                  styles.ratingItem,
-                  movie.ratingKinopoisk != null && styles.ratingItemGap,
-                ]}
-              >
-                <View style={styles.imdbBadge}>
-                  <Text style={styles.imdbText}>IMDb</Text>
-                </View>
-                <Text style={styles.ratingNum}>
-                  {formatRating(movie.ratingImdb)}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-
-          <View style={styles.tagRow}>
-            {movie.year != null ? <Tag label={String(movie.year)} /> : null}
-            {genre0 ? <Tag label={genre0} /> : null}
-            {ageLabel ? <Tag label={ageLabel} /> : null}
-          </View>
+        <View style={styles.tagRow}>
+          {movie.year != null ? <Tag label={String(movie.year)} /> : null}
+          {genre0 ? <Tag label={genre0} /> : null}
+          {ageLabel ? <Tag label={ageLabel} /> : null}
         </View>
       </View>
     </View>
@@ -165,7 +183,7 @@ function Tag({ label }: { label: string }) {
   if (!label) return null;
   return (
     <View style={styles.tag}>
-      <Text style={styles.tagText}>{label}</Text>
+      <Text style={styles.tagText} allowFontScaling={false}>{label}</Text>
     </View>
   );
 }
@@ -174,6 +192,16 @@ export default function HeroBillboard({ movies }: HeroBillboardProps) {
   const slides = useMemo(() => movies.filter(Boolean), [movies]);
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<FlatList<Movie>>(null);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const interval = setInterval(() => {
+      const nextIndex = (activeIndex + 1) % slides.length;
+      listRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+      setActiveIndex(nextIndex);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [activeIndex, slides.length]);
 
   const onScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -205,14 +233,7 @@ export default function HeroBillboard({ movies }: HeroBillboardProps) {
       <StatusBarMock />
 
       <View style={styles.headerRow}>
-        <LinearGradient
-          colors={['#8B5CF6', '#6366F1', '#3B82F6']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.logoBox}
-        >
-          <Text style={styles.logoText}>K</Text>
-        </LinearGradient>
+        <Image source={LOGO} style={styles.logoImg} resizeMode="cover" />
 
         <TouchableOpacity style={styles.bellBtn} activeOpacity={0.75}>
           <MaterialCommunityIcons
@@ -261,14 +282,16 @@ export default function HeroBillboard({ movies }: HeroBillboardProps) {
 
 const BG = '#121212';
 const TEXT_PRIMARY = '#FFFFFF';
-const TEXT_MUTED = '#9E9E9E';
-const TAG_BG = 'rgba(255,255,255,0.08)';
-const TAG_BORDER = 'rgba(255,255,255,0.18)';
+const TEXT_MUTED = '#9BA1A6';
+const TAG_BG = '#2B2E33';
 
 const CARD_PAD = 20;
-const CARD_GAP = 16;
-const POSTER_W = W * 0.46;
-const POSTER_H = POSTER_W * 1.52;
+const CARD_GAP = 22;
+const POSTER_W = W * 0.32;
+/** Mockup: poster balandligi qisqaroq (~2:3 atrofida) */
+const POSTER_H = POSTER_W * 1.36;
+const POSTER_SCALE = POSTER_W / 140;
+const INFO_TOP_OFFSET = POSTER_H * 0.42;
 
 const styles = StyleSheet.create({
   container: {
@@ -304,17 +327,10 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
   },
-  logoBox: {
-    width: 48,
-    height: 48,
+  logoImg: {
+    width: 80,
+    height: 80,
     borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoText: {
-    color: TEXT_PRIMARY,
-    fontSize: 24,
-    fontWeight: '800',
   },
   bellBtn: {
     width: 48,
@@ -339,7 +355,7 @@ const styles = StyleSheet.create({
   posterWrapper: {
     width: POSTER_W,
     height: POSTER_H,
-    borderRadius: 14,
+    borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: '#1a1a1a',
   },
@@ -349,98 +365,100 @@ const styles = StyleSheet.create({
   },
   posterDim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(8, 12, 28, 0.35)',
+    backgroundColor: 'rgba(12, 22, 48, 0.38)',
   },
   bannerStrip: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingVertical: 8,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingVertical: 6,
     alignItems: 'center',
   },
   bannerText: {
     color: TEXT_PRIMARY,
-    fontSize: 10,
+    fontSize: 9 * POSTER_SCALE,
     fontWeight: '700',
-    letterSpacing: 0.8,
+    letterSpacing: 0.6,
   },
   posterArtBlock: {
     position: 'absolute',
-    left: 4,
-    right: 4,
-    top: '28%',
+    left: 2,
+    right: 2,
+    top: '27%',
     alignItems: 'center',
   },
   posterArtRed: {
-    color: '#EF4444',
-    fontSize: 11,
-    lineHeight: 14,
+    color: '#DC2626',
+    fontSize: 8 * POSTER_SCALE,
+    lineHeight: 10.5 * POSTER_SCALE,
     fontWeight: '900',
     textAlign: 'center',
-    letterSpacing: 0.3,
+    letterSpacing: 0.15,
     textTransform: 'uppercase',
-    textShadowColor: 'rgba(0,0,0,0.9)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
   },
   posterArtWhiteLine: {
-    marginTop: 2,
+    marginTop: 4,
     color: '#FFFFFF',
-    fontSize: 13,
-    lineHeight: 16,
+    fontSize: 11 * POSTER_SCALE,
+    lineHeight: 13 * POSTER_SCALE,
     fontWeight: '900',
-    textAlign: 'center',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    textShadowColor: 'rgba(0,0,0,0.9)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
-  },
-  posterArtMotion: {
-    marginTop: 10,
-    color: '#EF4444',
-    fontSize: 9,
-    lineHeight: 12,
-    fontWeight: '800',
     textAlign: 'center',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
-    textShadowColor: 'rgba(0,0,0,0.9)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+  },
+  posterArtMotion: {
+    marginTop: 10,
+    color: '#DC2626',
+    fontSize: 7 * POSTER_SCALE,
+    lineHeight: 9 * POSTER_SCALE,
+    fontWeight: '800',
+    textAlign: 'center',
+    letterSpacing: 0.25,
+    textTransform: 'uppercase',
+  },
+  posterAgeBadge: {
+    position: 'absolute',
+    bottom: 8,
+    left: 8,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  posterAgeText: {
+    color: TEXT_PRIMARY,
+    fontSize: 9 * POSTER_SCALE,
+    fontWeight: '700',
   },
 
   infoCol: {
     flex: 1,
     minWidth: 0,
     height: POSTER_H,
-    justifyContent: 'space-between',
-  },
-  infoTop: {
-    gap: 10,
-    paddingTop: 2,
-  },
-  infoBottom: {
-    gap: 14,
+    justifyContent: 'flex-start',
+    paddingTop: INFO_TOP_OFFSET,
   },
   title: {
     color: TEXT_PRIMARY,
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '700',
-    lineHeight: 30,
-    letterSpacing: -0.3,
+    lineHeight: 25,
+    letterSpacing: -0.1,
   },
   desc: {
+    marginTop: 4,
     color: TEXT_MUTED,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '400',
   },
 
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 12,
   },
   ratingItem: {
     flexDirection: 'row',
@@ -448,41 +466,53 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   ratingItemGap: {
-    marginLeft: 16,
+    marginLeft: 12,
+  },
+  kpIconWrap: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#0D0D0D',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   imdbBadge: {
     backgroundColor: '#F5C518',
     borderRadius: 4,
-    paddingHorizontal: 6,
+    paddingHorizontal: 5,
     paddingVertical: 2,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   imdbText: {
     color: '#000',
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: '800',
+    lineHeight: 11,
   },
   ratingNum: {
     color: TEXT_PRIMARY,
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
+    lineHeight: 18,
   },
 
   tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
+    marginTop: 10,
   },
   tag: {
     backgroundColor: TAG_BG,
-    borderWidth: 1,
-    borderColor: TAG_BORDER,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
   },
   tagText: {
     color: TEXT_PRIMARY,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
   },
 
@@ -507,3 +537,5 @@ const styles = StyleSheet.create({
     backgroundColor: TEXT_PRIMARY,
   },
 });
+
+

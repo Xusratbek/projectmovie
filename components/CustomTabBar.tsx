@@ -1,18 +1,52 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+} from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width: W } = Dimensions.get('window');
 
-export default function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+const PURPLE = '#8B5CF6';
+const NAV_BG = 'rgba(28, 28, 30, 0.92)';
+const NAV_BORDER = 'rgba(255, 255, 255, 0.08)';
+const ACTIVE_PILL = '#3A3A3C';
+const WHITE = '#FFFFFF';
+const MUTED = '#8E8E93';
+
+const TAB_CONFIG: Record<
+  string,
+  { label: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }
+> = {
+  index: { label: 'Главная', icon: 'home-variant' },
+  library: { label: 'Библиотека', icon: 'cards-outline' },
+  profile: { label: 'Профиль', icon: 'account-outline' },
+};
+
+const VISIBLE_TABS = ['index', 'library', 'profile'];
+
+export default function CustomTabBar({
+  state,
+  navigation,
+}: BottomTabBarProps) {
+  const visibleRoutes = state.routes.filter((r) =>
+    VISIBLE_TABS.includes(r.name)
+  );
+
   return (
-    <View style={styles.wrapperContainer}>
-      <View style={styles.mainNavBlock}>
-        {state.routes.map((route, index) => {
-          const isFocused = state.index === index;
-          
-          // Expo Router'dagi modal yoki maxsus sahifalarni tab bar'da ko'rsatmaslik sharti
-          if (['_html', '+not-found', 'modal'].includes(route.name)) return null;
+    <View style={styles.wrapper}>
+      <View style={styles.mainNav}>
+        {visibleRoutes.map((route) => {
+          const routeIndex = state.routes.findIndex((r) => r.key === route.key);
+          const isFocused = state.index === routeIndex;
+          const config = TAB_CONFIG[route.name] ?? {
+            label: route.name,
+            icon: 'circle-outline' as const,
+          };
 
           const onPress = () => {
             const event = navigation.emit({
@@ -20,96 +54,98 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
               target: route.key,
               canPreventDefault: true,
             });
-
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name);
             }
           };
 
-          let icon = '🏠';
-          let label = 'Главная';
-          if (route.name === 'explore' || route.name === 'library') { icon = '📚'; label = 'Библиотека'; }
-          if (route.name === 'profile') { icon = '👤'; label = 'Профиль'; }
-
           return (
             <TouchableOpacity
               key={route.key}
               onPress={onPress}
-              style={[styles.tabButton, isFocused && styles.activeTabButton]}
-              activeOpacity={0.7}
+              style={[styles.tabBtn, isFocused && styles.tabBtnActive]}
+              activeOpacity={0.75}
             >
-              <Text style={[styles.tabIcon, { color: isFocused ? '#8A3FFC' : '#FFFFFF' }]}>{icon}</Text>
-              <Text style={[styles.tabLabel, { color: isFocused ? '#FFFFFF' : '#8E8E93' }]}>{label}</Text>
+              <MaterialCommunityIcons
+                name={config.icon}
+                size={22}
+                color={isFocused ? PURPLE : WHITE}
+              />
+              <Text
+                style={[styles.tabLabel, isFocused && styles.tabLabelActive]}
+              >
+                {config.label}
+              </Text>
             </TouchableOpacity>
           );
         })}
       </View>
 
-      <TouchableOpacity 
-        style={styles.searchButton} 
-        onPress={() => navigation.navigate('search' as any)}
+      <TouchableOpacity
+        style={styles.searchBtn}
+        onPress={() => navigation.navigate('search')}
         activeOpacity={0.8}
       >
-        <Text style={styles.searchTextIcon}>🔍</Text>
+        <MaterialCommunityIcons name="magnify" size={24} color={WHITE} />
       </TouchableOpacity>
     </View>
   );
 }
 
+const BAR_H = 64;
+const SEARCH_SIZE = 64;
+
 const styles = StyleSheet.create({
-  wrapperContainer: {
+  wrapper: {
     position: 'absolute',
     bottom: 28,
     left: 16,
     right: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    width: width - 32,
-    backgroundColor: 'transparent',
+    gap: 12,
   },
-  mainNavBlock: {
-    flexDirection: 'row',
-    backgroundColor: '#151517',
-    borderRadius: 30,
-    padding: 6,
+  mainNav: {
     flex: 1,
-    marginRight: 12,
+    flexDirection: 'row',
+    height: BAR_H,
+    backgroundColor: NAV_BG,
+    borderRadius: BAR_H / 2,
     borderWidth: 1,
-    borderColor: '#2C2C2E',
-    justifyContent: 'space-around',
+    borderColor: NAV_BORDER,
+    paddingHorizontal: 6,
+    paddingVertical: 6,
     alignItems: 'center',
-    height: 64,
+    justifyContent: 'space-around',
   },
-  tabButton: {
+  tabBtn: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 22,
+    borderRadius: 20,
+    gap: 2,
   },
-  activeTabButton: {
-    backgroundColor: '#262629',
-  },
-  tabIcon: {
-    fontSize: 16,
+  tabBtnActive: {
+    backgroundColor: ACTIVE_PILL,
   },
   tabLabel: {
     fontSize: 11,
     fontWeight: '600',
-    marginTop: 2,
+    color: MUTED,
+    marginTop: 1,
   },
-  searchButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#151517',
+  tabLabelActive: {
+    color: WHITE,
+  },
+  searchBtn: {
+    width: SEARCH_SIZE,
+    height: SEARCH_SIZE,
+    borderRadius: SEARCH_SIZE / 2,
+    backgroundColor: NAV_BG,
     borderWidth: 1,
-    borderColor: '#2C2C2E',
+    borderColor: NAV_BORDER,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  searchTextIcon: {
-    fontSize: 20,
-    color: '#FFFFFF',
   },
 });

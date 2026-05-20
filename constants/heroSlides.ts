@@ -4,15 +4,10 @@ import { Movie } from '../types/movie';
 export const HERO_SLIDES: Movie[] = [
   {
     id: 'hero-1',
-    title: 'Паранормальное явление',
+    title: 'Паранормальное\nявление',
     description:
       'Мать с дочерью проживают в квартире, которую, как они подозре...',
-    poster:
-      'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=85&w=800',
-    heroCinemaLine: 'В КИНО С 14 МАЯ',
-    heroPosterTitleRed: 'ПАРАНОРМАЛЬНОЕ ЯВЛЕНИЕ',
-    heroPosterSubtitleWhite: 'СЕУЛ',
-    heroPosterMotion: 'ОБНАРУЖЕНО ДВИЖЕНИЕ',
+    poster: require('../assets/images/hero-poster-paranormal.png'),
     ratingKinopoisk: 7.9,
     ratingImdb: 8.3,
     year: 2026,
@@ -21,9 +16,9 @@ export const HERO_SLIDES: Movie[] = [
   },
   {
     id: 'hero-2',
-    title: 'Гнев человеческий',
+    title: 'Гнев\nчеловеческий',
     description:
-      'Тихий инвестор мстит за убийство сына. Каждый выстрел — часть плана...',
+      'Тихий инвестор мстит за убийство сына. Каждый выстрел — часть...',
     poster:
       'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=85&w=800',
     heroCinemaLine: 'В КИНО С 21 МАЯ',
@@ -38,9 +33,9 @@ export const HERO_SLIDES: Movie[] = [
   },
   {
     id: 'hero-3',
-    title: 'Дюна: Часть вторая',
+    title: 'Дюна:\nЧасть вторая',
     description:
-      'Пол Атрейдес объединяется с фременами, чтобы изменить судьбу вселенной...',
+      'Пол Атрейдес объединяется с фременами, чтобы изменить судьбу...',
     poster:
       'https://images.unsplash.com/photo-1440404653325-ab12749adca1?q=85&w=800',
     heroCinemaLine: 'УЖЕ В КИНО',

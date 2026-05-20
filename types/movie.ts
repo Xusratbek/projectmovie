@@ -1,7 +1,7 @@
 export interface Movie {
   id: string;
   title: string;
-  poster: string;
+  poster: string | number;
   description?: string;
   /** Hero posterning yuqori qator (masalan «В КИНО С 14 МАЯ») */
   heroCinemaLine?: string;
@@ -26,5 +26,8 @@ export interface QuickSelection {
   id: string;
   title: string;
   icon: string;
-  backgroundColor: string;
+  backgroundColor?: string;
+  gradientColors?: string[];
+  /** Ixtiyoriy fon rasmi */
+  image?: string | number;
 }
