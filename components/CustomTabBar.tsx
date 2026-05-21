@@ -8,13 +8,13 @@ import {
 } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GlassFallback, GlassTints } from '../constants/glass';
+import LiquidGlass from './ui/LiquidGlass';
 
 const { width: W } = Dimensions.get('window');
 
 const PURPLE = '#8B5CF6';
-const NAV_BG = 'rgba(28, 28, 30, 0.92)';
 const NAV_BORDER = 'rgba(255, 255, 255, 0.08)';
-const ACTIVE_PILL = '#3A3A3C';
 const WHITE = '#FFFFFF';
 const MUTED = '#8E8E93';
 
@@ -39,7 +39,12 @@ export default function CustomTabBar({
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.mainNav}>
+      <LiquidGlass
+        style={styles.mainNav}
+        fallbackBackgroundColor={GlassFallback.nav}
+        tintColor={GlassTints.nav}
+        isInteractive
+      >
         {visibleRoutes.map((route) => {
           const routeIndex = state.routes.findIndex((r) => r.key === route.key);
           const isFocused = state.index === routeIndex;
@@ -59,13 +64,8 @@ export default function CustomTabBar({
             }
           };
 
-          return (
-            <TouchableOpacity
-              key={route.key}
-              onPress={onPress}
-              style={[styles.tabBtn, isFocused && styles.tabBtnActive]}
-              activeOpacity={0.75}
-            >
+          const tabContent = (
+            <>
               <MaterialCommunityIcons
                 name={config.icon}
                 size={22}
@@ -76,17 +76,45 @@ export default function CustomTabBar({
               >
                 {config.label}
               </Text>
+            </>
+          );
+
+          return (
+            <TouchableOpacity
+              key={route.key}
+              onPress={onPress}
+              style={styles.tabBtn}
+              activeOpacity={0.75}
+            >
+              {isFocused ? (
+                <LiquidGlass
+                  style={styles.tabBtnActive}
+                  fallbackBackgroundColor={GlassFallback.activeTab}
+                  tintColor={GlassTints.activeTab}
+                >
+                  {tabContent}
+                </LiquidGlass>
+              ) : (
+                tabContent
+              )}
             </TouchableOpacity>
           );
         })}
-      </View>
+      </LiquidGlass>
 
       <TouchableOpacity
-        style={styles.searchBtn}
+        style={styles.searchBtnOuter}
         onPress={() => navigation.navigate('search')}
         activeOpacity={0.8}
       >
-        <MaterialCommunityIcons name="magnify" size={24} color={WHITE} />
+        <LiquidGlass
+          style={styles.searchBtn}
+          fallbackBackgroundColor={GlassFallback.nav}
+          tintColor={GlassTints.nav}
+          isInteractive
+        >
+          <MaterialCommunityIcons name="magnify" size={24} color={WHITE} />
+        </LiquidGlass>
       </TouchableOpacity>
     </View>
   );
@@ -109,7 +137,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     height: BAR_H,
-    backgroundColor: NAV_BG,
     borderRadius: BAR_H / 2,
     borderWidth: 1,
     borderColor: NAV_BORDER,
@@ -117,6 +144,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     alignItems: 'center',
     justifyContent: 'space-around',
+    overflow: 'hidden',
   },
   tabBtn: {
     flex: 1,
@@ -127,7 +155,13 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   tabBtnActive: {
-    backgroundColor: ACTIVE_PILL,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 2,
+    alignSelf: 'stretch',
   },
   tabLabel: {
     fontSize: 11,
@@ -138,14 +172,18 @@ const styles = StyleSheet.create({
   tabLabelActive: {
     color: WHITE,
   },
+  searchBtnOuter: {
+    width: SEARCH_SIZE,
+    height: SEARCH_SIZE,
+  },
   searchBtn: {
     width: SEARCH_SIZE,
     height: SEARCH_SIZE,
     borderRadius: SEARCH_SIZE / 2,
-    backgroundColor: NAV_BG,
     borderWidth: 1,
     borderColor: NAV_BORDER,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
 });

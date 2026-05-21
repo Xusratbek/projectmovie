@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { ScrollView } from 'react-native';
-import HeroBillboard from '../../components/HeroBillboard';
+import HeroBillboard from '../../components/hero/HeroBillboard';
 import BecauseYouWatchedSection from '../../components/home/BecauseYouWatchedSection';
 import ContinueWatchingSection from '../../components/home/ContinueWatchingSection';
 import EveningSelectionSection from '../../components/home/EveningSelectionSection';

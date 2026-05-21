@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { AppColors } from '../../constants/theme';
+import { GlassFallback, GlassTints } from '../../constants/glass';
 import { Layout } from '../../constants/layout';
 import { TrendingPeriod } from '../../types/home';
+import LiquidGlass from './LiquidGlass';
 
 type TabOption = {
   id: TrendingPeriod;
@@ -24,7 +26,11 @@ interface PeriodFilterTabsProps {
 export default function PeriodFilterTabs({ value, onChange }: PeriodFilterTabsProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.pill}>
+      <LiquidGlass
+        style={styles.pill}
+        fallbackBackgroundColor={GlassFallback.surface}
+        tintColor={GlassTints.surface}
+      >
         {TRENDING_TABS.map((tab) => {
           const isActive = value === tab.id;
           return (
@@ -43,7 +49,7 @@ export default function PeriodFilterTabs({ value, onChange }: PeriodFilterTabsPr
             </TouchableOpacity>
           );
         })}
-      </View>
+      </LiquidGlass>
     </View>
   );
 }
@@ -56,8 +62,8 @@ const styles = StyleSheet.create({
   },
   pill: {
     flexDirection: 'row',
-    backgroundColor: AppColors.surface,
     borderRadius: 24,
+    overflow: 'hidden',
     padding: 3,
     alignSelf: 'flex-start',
   },

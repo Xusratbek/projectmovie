@@ -5,8 +5,6 @@ import { HeroLayout } from '../constants/heroLayout';
 const { cardPadding, posterScale, posterWidth, posterHeight, infoTopOffset, screenWidth } =
   HeroLayout;
 
-const TAG_BG = '#2B2E33';
-
 export const heroStyles = StyleSheet.create({
   container: {
     backgroundColor: AppColors.background,
@@ -212,8 +210,8 @@ export const heroStyles = StyleSheet.create({
     marginTop: 10,
   },
   tag: {
-    backgroundColor: TAG_BG,
     paddingHorizontal: 12,
+    overflow: 'hidden',
     paddingVertical: 6,
     borderRadius: 14,
   },

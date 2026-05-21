@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GlassTints } from '../constants/glass';
 import { Movie } from '../types/movie';
+import LiquidGlass from './ui/LiquidGlass';
 
 interface StandardMovieCardProps {
   movie: Movie;
@@ -50,9 +52,14 @@ export default function StandardMovieCard({ movie, showIndex, onPress }: Standar
         
         {/* Top Left: Circular Index Badge */}
         {showIndex !== undefined && (
-          <View style={styles.indexBadge}>
+          <LiquidGlass
+            style={styles.indexBadge}
+            fallbackBackgroundColor="rgba(0, 0, 0, 0.5)"
+            tintColor={GlassTints.chrome}
+            glassEffectStyle="clear"
+          >
             <Text style={styles.indexText} allowFontScaling={false}>{showIndex}</Text>
-          </View>
+          </LiquidGlass>
         )}
 
         {/* Bottom Left: Ratings Overlay inside the poster */}
@@ -151,7 +158,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     left: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     width: 26,
     height: 26,
     borderRadius: 13,

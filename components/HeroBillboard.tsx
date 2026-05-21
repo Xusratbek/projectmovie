@@ -1,2 +1,4 @@
 /** Eski import yo‘li saqlanadi */
-export { default } from './hero/HeroBillboard';
+import HeroBillboard from './hero/HeroBillboard';
+
+export default HeroBillboard;

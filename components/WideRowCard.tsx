@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GlassFallback, GlassTints } from '../constants/glass';
 import { Movie } from '../types/movie';
+import LiquidGlass from './ui/LiquidGlass';
 
 interface WideRowCardProps {
   movie: Movie;
@@ -17,7 +19,11 @@ export default function WideRowCard({ movie, onPress }: WideRowCardProps) {
   }, [posterUri, movie.poster]);
 
   return (
-    <View style={styles.cardContainer}>
+    <LiquidGlass
+      style={styles.cardContainer}
+      fallbackBackgroundColor={GlassFallback.card}
+      tintColor={GlassTints.card}
+    >
       {!posterFailed && (posterUri || typeof movie.poster === 'number') ? (
         <Image
           source={
@@ -58,20 +64,26 @@ export default function WideRowCard({ movie, onPress }: WideRowCardProps) {
             <Text style={styles.watchText} allowFontScaling={false}>Смотреть</Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.bookmarkButton} activeOpacity={0.7}>
-            <MaterialCommunityIcons name="bookmark-outline" size={18} color="#FFFFFF" />
+          <TouchableOpacity activeOpacity={0.7}>
+            <LiquidGlass
+              style={styles.bookmarkButton}
+              fallbackBackgroundColor={GlassFallback.chrome}
+              tintColor={GlassTints.chrome}
+            >
+              <MaterialCommunityIcons name="bookmark-outline" size={18} color="#FFFFFF" />
+            </LiquidGlass>
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </LiquidGlass>
   );
 }
 
 const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1C1C1E',
     borderRadius: 20,
+    overflow: 'hidden',
     padding: 14,
     alignItems: 'center',
     borderWidth: 1,
@@ -134,7 +146,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   bookmarkButton: {
-    backgroundColor: '#2C2C2E',
     width: 38,
     height: 38,
     borderRadius: 19,

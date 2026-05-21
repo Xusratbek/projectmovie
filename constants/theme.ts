@@ -14,3 +14,6 @@ export const AppColors = {
   tabActiveText: '#121212',
   watchButton: '#E8E8ED',
 } as const;
+
+/** @see constants/glass.ts — Liquid Glass tint va fallback */
+export { GlassFallback, GlassTints } from './glass';
