@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Movie } from '../types/movie';
+import GlassOverlay from './ui/GlassOverlay';
 
 interface AnimePosterCardProps {
   movie: Movie;
@@ -25,15 +25,11 @@ export default function AnimePosterCard({ movie, onPress }: AnimePosterCardProps
           resizeMode="cover"
         />
         
-        {/* Smooth dark gradient at the bottom */}
-        <LinearGradient
-          colors={['transparent', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.95)']}
-          style={styles.gradient}
-        >
+        <GlassOverlay style={styles.titleGlass}>
           <Text style={styles.title} numberOfLines={2} allowFontScaling={false}>
             {movie.title}
           </Text>
-        </LinearGradient>
+        </GlassOverlay>
       </View>
     </TouchableOpacity>
   );
@@ -49,20 +45,20 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: '#1C1C1E',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   poster: {
     width: '100%',
     height: '100%',
   },
-  gradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '60%', // tall enough to contain 2 lines of text cleanly
-    justifyContent: 'flex-end',
+  titleGlass: {
+    height: '32%',
     paddingHorizontal: 8,
     paddingBottom: 10,
+    paddingTop: 12,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   title: {
     color: '#FFFFFF',
@@ -70,8 +66,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     lineHeight: 16,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
   },
 });

@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Image, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { GlassBorder } from '../constants/glass';
+import GlassNoise from './ui/GlassNoise';
+import LiquidGlass from './ui/LiquidGlass';
 
 export type MoodImageSource = number | { uri: string };
 
@@ -40,17 +43,25 @@ export default function MoodSelectionCard({
         />
       ) : null}
 
-      {/* Matn PNG ichida bo‘lsa, ustiga yozmaymiz — soyа/ikki marta ko‘rinmasin */}
-      {useGradient ? (
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.45)']}
-          style={styles.titleGradient}
-        >
-          <Text style={styles.title} allowFontScaling={false}>
-            {title}
-          </Text>
-        </LinearGradient>
-      ) : null}
+      <GlassNoise />
+
+      <LiquidGlass
+        style={styles.glassVeil}
+        fallbackBackgroundColor="rgba(255, 255, 255, 0.05)"
+        tintColor="rgba(255, 255, 255, 0.07)"
+        glassEffectStyle="clear"
+      >
+        {useGradient ? (
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.45)']}
+            style={styles.titleGradient}
+          >
+            <Text style={styles.title} allowFontScaling={false}>
+              {title}
+            </Text>
+          </LinearGradient>
+        ) : null}
+      </LiquidGlass>
     </TouchableOpacity>
   );
 }
@@ -62,6 +73,8 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     overflow: 'hidden',
     backgroundColor: '#1C1C1E',
+    borderWidth: 1,
+    borderColor: GlassBorder,
   },
   fill: {
     width: '100%',
@@ -87,6 +100,9 @@ const styles = StyleSheet.create({
     bottom: -30,
     left: -10,
     transform: [{ rotate: '-18deg' }],
+  },
+  glassVeil: {
+    ...StyleSheet.absoluteFillObject,
   },
   titleGradient: {
     position: 'absolute',

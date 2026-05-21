@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
-import { GlassFallback, GlassTints } from '../../constants/glass';
+import { GlassBorder, GlassFallback, GlassTints } from '../../constants/glass';
 import { AppColors } from '../../constants/theme';
 import LiquidGlass from '../ui/LiquidGlass';
 import { heroStyles } from '../../styles/heroBillboard';
@@ -15,7 +15,7 @@ export default function HeroHeader() {
       <Image source={LOGO} style={heroStyles.logoImg} resizeMode="cover" />
       <TouchableOpacity activeOpacity={0.75}>
         <LiquidGlass
-          style={heroStyles.bellBtn}
+          style={[heroStyles.bellBtn, { borderColor: GlassBorder }]}
           fallbackBackgroundColor={GlassFallback.nav}
           tintColor={GlassTints.nav}
           glassEffectStyle="clear"

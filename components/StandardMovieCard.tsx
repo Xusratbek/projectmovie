@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { GlassTints } from '../constants/glass';
+import { GlassBorder, GlassFallback, GlassTints } from '../constants/glass';
 import { Movie } from '../types/movie';
+import GlassOverlay from './ui/GlassOverlay';
 import LiquidGlass from './ui/LiquidGlass';
 
 interface StandardMovieCardProps {
@@ -50,70 +51,79 @@ export default function StandardMovieCard({ movie, showIndex, onPress }: Standar
           </View>
         )}
         
-        {/* Top Left: Circular Index Badge */}
         {showIndex !== undefined && (
           <LiquidGlass
             style={styles.indexBadge}
-            fallbackBackgroundColor="rgba(0, 0, 0, 0.5)"
-            tintColor={GlassTints.chrome}
+            fallbackBackgroundColor={GlassFallback.badge}
+            tintColor={GlassTints.badge}
             glassEffectStyle="clear"
           >
             <Text style={styles.indexText} allowFontScaling={false}>{showIndex}</Text>
           </LiquidGlass>
         )}
 
-        {/* Bottom Left: Ratings Overlay inside the poster */}
         {hasRatings && (
           <View style={styles.ratingsOverlay}>
             {movie.ratingKinopoisk != null && (
-              <View style={styles.ratingOverlayItem}>
-                <View style={styles.kpIconWrap}>
-                  <MaterialCommunityIcons
-                    name="white-balance-sunny"
-                    size={9}
-                    color="#FF8A00"
-                  />
+              <LiquidGlass
+                style={styles.ratingPill}
+                fallbackBackgroundColor={GlassFallback.badge}
+                tintColor={GlassTints.badge}
+                glassEffectStyle="clear"
+              >
+                <View style={styles.ratingOverlayItem}>
+                  <View style={styles.kpIconWrap}>
+                    <MaterialCommunityIcons
+                      name="white-balance-sunny"
+                      size={9}
+                      color="#FF8A00"
+                    />
+                  </View>
+                  <Text style={styles.ratingOverlayNum} allowFontScaling={false}>
+                    {movie.ratingKinopoisk}
+                  </Text>
                 </View>
-                <Text style={styles.ratingOverlayNum} allowFontScaling={false}>
-                  {movie.ratingKinopoisk}
-                </Text>
-              </View>
+              </LiquidGlass>
             )}
             
             {movie.ratingImdb != null && (
-              <View style={styles.ratingOverlayItem}>
-                <View style={styles.imdbOverlayBadge}>
-                  <Text style={styles.imdbOverlayText} allowFontScaling={false}>IMDb</Text>
+              <LiquidGlass
+                style={styles.ratingPill}
+                fallbackBackgroundColor={GlassFallback.badge}
+                tintColor={GlassTints.badge}
+                glassEffectStyle="clear"
+              >
+                <View style={styles.ratingOverlayItem}>
+                  <View style={styles.imdbOverlayBadge}>
+                    <Text style={styles.imdbOverlayText} allowFontScaling={false}>IMDb</Text>
+                  </View>
+                  <Text style={styles.ratingOverlayNum} allowFontScaling={false}>
+                    {movie.ratingImdb}
+                  </Text>
                 </View>
-                <Text style={styles.ratingOverlayNum} allowFontScaling={false}>
-                  {movie.ratingImdb}
-                </Text>
-              </View>
+              </LiquidGlass>
             )}
           </View>
         )}
 
-        {/* Progress Overlay Text & Bar (Продолжить просмотр) */}
         {movie.progress !== undefined && (
-          <>
+          <GlassOverlay style={styles.progressGlass}>
             {(movie.seasonEpisode || movie.duration) && (
-              <View style={styles.progressOverlay}>
-                <View style={styles.progressTextRow}>
-                  {movie.seasonEpisode ? (
-                    <Text style={styles.progressOverlayText} allowFontScaling={false}>
-                      {movie.seasonEpisode}
-                    </Text>
-                  ) : movie.duration ? (
-                    <Text style={styles.progressOverlayText} allowFontScaling={false}>
-                      {movie.duration}
-                    </Text>
-                  ) : null}
-                  {movie.seasonEpisode && movie.duration ? (
-                    <Text style={styles.progressOverlayText} allowFontScaling={false}>
-                      {movie.duration}
-                    </Text>
-                  ) : null}
-                </View>
+              <View style={styles.progressTextRow}>
+                {movie.seasonEpisode ? (
+                  <Text style={styles.progressOverlayText} allowFontScaling={false}>
+                    {movie.seasonEpisode}
+                  </Text>
+                ) : movie.duration ? (
+                  <Text style={styles.progressOverlayText} allowFontScaling={false}>
+                    {movie.duration}
+                  </Text>
+                ) : null}
+                {movie.seasonEpisode && movie.duration ? (
+                  <Text style={styles.progressOverlayText} allowFontScaling={false}>
+                    {movie.duration}
+                  </Text>
+                ) : null}
               </View>
             )}
 
@@ -125,7 +135,7 @@ export default function StandardMovieCard({ movie, showIndex, onPress }: Standar
                 ]}
               />
             </View>
-          </>
+          </GlassOverlay>
         )}
       </View>
     </TouchableOpacity>
@@ -142,6 +152,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#1C1C1E',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   poster: {
     width: '100%',
@@ -163,6 +175,8 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: GlassBorder,
   },
   indexText: {
     color: '#FFFFFF',
@@ -175,7 +189,14 @@ const styles = StyleSheet.create({
     left: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
+  },
+  ratingPill: {
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: GlassBorder,
   },
   ratingOverlayItem: {
     flexDirection: 'row',
@@ -211,33 +232,27 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     lineHeight: 15,
   },
-  progressOverlay: {
-    position: 'absolute',
-    bottom: 16,
-    left: 8,
-    right: 8,
+  progressGlass: {
+    height: 56,
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   progressTextRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 8,
+    marginBottom: 6,
   },
   progressOverlayText: {
     color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '700',
-    textShadowColor: 'rgba(0, 0, 0, 0.85)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
   },
   progressTrack: {
-    position: 'absolute',
-    bottom: 8,
-    left: 8,
-    right: 8,
     height: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     borderRadius: 3,
     overflow: 'hidden',
   },

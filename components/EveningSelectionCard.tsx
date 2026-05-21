@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ImageSourcePropType } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GlassBorder, GlassFallback, GlassTints } from '../constants/glass';
+import LiquidGlass from './ui/LiquidGlass';
 
 interface EveningSelectionCardProps {
   title: string;
@@ -22,53 +24,56 @@ export default function EveningSelectionCard({
   onPress,
 }: EveningSelectionCardProps) {
   return (
-    <TouchableOpacity style={styles.cardContainer} onPress={onPress} activeOpacity={0.9}>
-      <View style={styles.leftColumn}>
-        <Text style={styles.title} numberOfLines={2}>
-          {title}
-        </Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
-        
-        {/* Ratings row */}
-        <View style={styles.ratingsRow}>
-          <View style={styles.ratingItem}>
-            <View style={styles.kpIconWrap}>
-              <MaterialCommunityIcons name="white-balance-sunny" size={11} color="#FFFFFF" />
-            </View>
-            <Text style={styles.ratingText}>{ratingKinopoisk.toFixed(1)}</Text>
-          </View>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+      <LiquidGlass
+        style={styles.cardContainer}
+        fallbackBackgroundColor={GlassFallback.evening}
+        tintColor={GlassTints.evening}
+        glassEffectStyle="clear"
+      >
+        <View style={styles.leftColumn}>
+          <Text style={styles.title} numberOfLines={2}>
+            {title}
+          </Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
           
-          <View style={styles.ratingItem}>
-            <View style={styles.imdbBadge}>
-              <Text style={styles.imdbText}>IMDb</Text>
+          <View style={styles.ratingsRow}>
+            <View style={styles.ratingItem}>
+              <View style={styles.kpIconWrap}>
+                <MaterialCommunityIcons name="white-balance-sunny" size={11} color="#FFFFFF" />
+              </View>
+              <Text style={styles.ratingText}>{ratingKinopoisk.toFixed(1)}</Text>
             </View>
-            <Text style={styles.ratingText}>{ratingImdb.toFixed(1)}</Text>
+            
+            <View style={styles.ratingItem}>
+              <View style={styles.imdbBadge}>
+                <Text style={styles.imdbText}>IMDb</Text>
+              </View>
+              <Text style={styles.ratingText}>{ratingImdb.toFixed(1)}</Text>
+            </View>
+          </View>
+
+          <View style={styles.actionRow}>
+            <TouchableOpacity style={styles.playButton} onPress={onPress} activeOpacity={0.85}>
+              <Text style={styles.playIcon}>▶</Text>
+              <Text style={styles.playText}>Смотреть</Text>
+            </TouchableOpacity>
+            <Text style={styles.durationText}>{duration}</Text>
           </View>
         </View>
 
-        {/* Action Row */}
-        <View style={styles.actionRow}>
-          <TouchableOpacity style={styles.playButton} onPress={onPress} activeOpacity={0.85}>
-            <Text style={styles.playIcon}>▶</Text>
-            <Text style={styles.playText}>Смотреть</Text>
-          </TouchableOpacity>
-          <Text style={styles.durationText}>{duration}</Text>
+        <View style={styles.rightColumn}>
+          <View style={styles.posterShadowContainer}>
+            <Image source={poster} style={styles.posterImage} resizeMode="cover" />
+          </View>
         </View>
-      </View>
-
-      {/* Right Column: 3D tilted poster */}
-      <View style={styles.rightColumn}>
-        <View style={styles.posterShadowContainer}>
-          <Image source={poster} style={styles.posterImage} resizeMode="cover" />
-        </View>
-      </View>
+      </LiquidGlass>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: '#411717',
     borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 18,
@@ -77,6 +82,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 180,
+    borderWidth: 1,
+    borderColor: GlassBorder,
+    overflow: 'hidden',
   },
   leftColumn: {
     flex: 1.4,

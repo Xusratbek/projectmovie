@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { GlassFallback, GlassTints } from '../../constants/glass';
+import { GlassBorder, GlassFallback, GlassTints } from '../../constants/glass';
 import LiquidGlass from '../ui/LiquidGlass';
 import { heroStyles } from '../../styles/heroBillboard';
 
@@ -13,8 +13,8 @@ export default function HeroTag({ label }: HeroTagProps) {
 
   return (
     <LiquidGlass
-      style={heroStyles.tag}
-      fallbackBackgroundColor="#2B2E33"
+      style={[heroStyles.tag, { borderWidth: 1, borderColor: GlassBorder }]}
+      fallbackBackgroundColor={GlassFallback.chrome}
       tintColor={GlassTints.chrome}
       glassEffectStyle="clear"
     >

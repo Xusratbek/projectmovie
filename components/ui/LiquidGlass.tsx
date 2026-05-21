@@ -1,10 +1,12 @@
 import React, { ReactNode } from 'react';
-import { Platform, StyleProp, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { BlurView } from 'expo-blur';
 import {
   GlassStyle,
   GlassView,
   isGlassEffectAPIAvailable,
 } from 'expo-glass-effect';
+import { GlassBlur } from '../../constants/glass';
 
 export type LiquidGlassProps = {
   style?: StyleProp<ViewStyle>;
@@ -13,6 +15,8 @@ export type LiquidGlassProps = {
   glassEffectStyle?: GlassStyle;
   tintColor?: string;
   isInteractive?: boolean;
+  /** Blur kuchi — poster overlay uchun kuchliroq */
+  blurIntensity?: number;
   children?: ReactNode;
 };
 
@@ -21,13 +25,21 @@ export function useLiquidGlass(): boolean {
   return Platform.OS === 'ios' && isGlassEffectAPIAvailable();
 }
 
-/** Dizayn bir xil: iOS da GlassView, qolganida oddiy View + fallback fon */
+/**
+ * Android’da dimezis BlurView hardware bitmap bilan crash qiladi
+ * (“Software rendering doesn't support hardware bitmaps”).
+ * Shuning uchun blur faqat iOS/web; Android — tint fallback.
+ */
+const supportsBackdropBlur = Platform.OS === 'ios' || Platform.OS === 'web';
+
+/** Dizayn bir xil: iOS da GlassView, qolganida BlurView yoki tint fallback */
 export default function LiquidGlass({
   style,
   fallbackBackgroundColor,
   glassEffectStyle = 'regular',
   tintColor,
   isInteractive,
+  blurIntensity = GlassBlur.medium,
   children,
 }: LiquidGlassProps) {
   if (useLiquidGlass()) {
@@ -43,16 +55,31 @@ export default function LiquidGlass({
     );
   }
 
+  const tint =
+    tintColor ??
+    fallbackBackgroundColor ??
+    'rgba(28, 28, 30, 0.5)';
+
   return (
-    <View
-      style={[
-        style,
-        fallbackBackgroundColor != null && {
-          backgroundColor: fallbackBackgroundColor,
-        },
-      ]}
-    >
+    <View style={[style, styles.shell]}>
+      {supportsBackdropBlur ? (
+        <BlurView
+          intensity={blurIntensity}
+          tint="dark"
+          style={StyleSheet.absoluteFillObject}
+        />
+      ) : null}
+      <View
+        style={[StyleSheet.absoluteFillObject, { backgroundColor: tint }]}
+        pointerEvents="none"
+      />
       {children}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  shell: {
+    overflow: 'hidden',
+  },
+});

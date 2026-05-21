@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { GlassFallback, GlassTints } from '../constants/glass';
+import { GlassBorder, GlassFallback, GlassTints } from '../constants/glass';
 import { Movie } from '../types/movie';
 import LiquidGlass from './ui/LiquidGlass';
 
@@ -23,6 +23,7 @@ export default function WideRowCard({ movie, onPress }: WideRowCardProps) {
       style={styles.cardContainer}
       fallbackBackgroundColor={GlassFallback.card}
       tintColor={GlassTints.card}
+      glassEffectStyle="clear"
     >
       {!posterFailed && (posterUri || typeof movie.poster === 'number') ? (
         <Image
@@ -66,9 +67,10 @@ export default function WideRowCard({ movie, onPress }: WideRowCardProps) {
           
           <TouchableOpacity activeOpacity={0.7}>
             <LiquidGlass
-              style={styles.bookmarkButton}
+              style={[styles.bookmarkButton, { borderWidth: 1, borderColor: GlassBorder }]}
               fallbackBackgroundColor={GlassFallback.chrome}
               tintColor={GlassTints.chrome}
+              glassEffectStyle="clear"
             >
               <MaterialCommunityIcons name="bookmark-outline" size={18} color="#FFFFFF" />
             </LiquidGlass>
@@ -87,7 +89,7 @@ const styles = StyleSheet.create({
     padding: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#2A2A2C',
+    borderColor: GlassBorder,
   },
   poster: {
     width: 88,

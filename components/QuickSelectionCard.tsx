@@ -1,8 +1,11 @@
 import React from 'react';
-import { Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, Image, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GlassBorder } from '../constants/glass';
 import { QuickSelection } from '../types/movie';
+import GlassNoise from './ui/GlassNoise';
+import LiquidGlass from './ui/LiquidGlass';
 
 interface QuickSelectionCardProps {
   item: QuickSelection;
@@ -36,17 +39,26 @@ export default function QuickSelectionCard({ item, onPress }: QuickSelectionCard
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
+      />
+      <GlassNoise />
+      <LiquidGlass
+        style={styles.glassVeil}
+        fallbackBackgroundColor="rgba(255, 255, 255, 0.04)"
+        tintColor="rgba(255, 255, 255, 0.06)"
+        glassEffectStyle="clear"
       >
-        <Text style={styles.title} numberOfLines={2} allowFontScaling={false}>
-          {item.title}
-        </Text>
-        <MaterialCommunityIcons
-          name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-          size={36}
-          color="#FFFFFF"
-          style={styles.icon}
-        />
-      </LinearGradient>
+        <View style={styles.content}>
+          <Text style={styles.title} numberOfLines={2} allowFontScaling={false}>
+            {item.title}
+          </Text>
+          <MaterialCommunityIcons
+            name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+            size={36}
+            color="#FFFFFF"
+            style={styles.icon}
+          />
+        </View>
+      </LiquidGlass>
     </TouchableOpacity>
   );
 }
@@ -58,11 +70,19 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     overflow: 'hidden',
     backgroundColor: '#1C1C1E',
+    borderWidth: 1,
+    borderColor: GlassBorder,
   },
   bgImage: {
     ...StyleSheet.absoluteFillObject,
   },
   gradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  glassVeil: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  content: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
