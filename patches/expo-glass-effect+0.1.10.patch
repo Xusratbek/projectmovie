@@ -1,0 +1,43 @@
+diff --git a/node_modules/expo-glass-effect/build/GlassContainer.js b/node_modules/expo-glass-effect/build/GlassContainer.js
+index a4c04df..9fee999 100644
+--- a/node_modules/expo-glass-effect/build/GlassContainer.js
++++ b/node_modules/expo-glass-effect/build/GlassContainer.js
+@@ -3,6 +3,6 @@
+ import React from 'react';
+ import { View } from 'react-native';
+ export default function GlassContainer(props) {
+-    return <View {...props}/>;
++    return React.createElement(View, props);
+ }
+ //# sourceMappingURL=GlassContainer.js.map
+\ No newline at end of file
+diff --git a/node_modules/expo-glass-effect/build/GlassView.ios.js b/node_modules/expo-glass-effect/build/GlassView.ios.js
+index 281fead..8eb1cf8 100644
+--- a/node_modules/expo-glass-effect/build/GlassView.ios.js
++++ b/node_modules/expo-glass-effect/build/GlassView.ios.js
+@@ -1,9 +1,10 @@
+ // Copyright © 2024 650 Industries.
+ 'use client';
++import React from 'react';
+ import { requireNativeViewManager } from 'expo-modules-core';
+ const NativeGlassView = requireNativeViewManager('ExpoGlassEffect', 'GlassView');
+ const GlassView = (props) => {
+-    return <NativeGlassView {...props}/>;
++    return React.createElement(NativeGlassView, props);
+ };
+ export default GlassView;
+ //# sourceMappingURL=GlassView.ios.js.map
+\ No newline at end of file
+diff --git a/node_modules/expo-glass-effect/build/GlassView.js b/node_modules/expo-glass-effect/build/GlassView.js
+index e6799cf..ae46a29 100644
+--- a/node_modules/expo-glass-effect/build/GlassView.js
++++ b/node_modules/expo-glass-effect/build/GlassView.js
+@@ -3,6 +3,6 @@
+ import React from 'react';
+ import { View } from 'react-native';
+ export default function GlassView(props) {
+-    return <View {...props}/>;
++    return React.createElement(View, props);
+ }
+ //# sourceMappingURL=GlassView.js.map
+\ No newline at end of file
